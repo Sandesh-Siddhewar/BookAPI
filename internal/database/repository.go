@@ -5,10 +5,13 @@ import (
 	"log"
 	"os"
 
+	"github.com/Sandesh-Siddhewar/eBook/BOOKAPI/internal/auth"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
+
+var DB *gorm.DB
 
 func Database() {
 	if err := godotenv.Load(); err != nil {
@@ -60,7 +63,7 @@ func Database() {
 	}
 	log.Printf("Database connected successfully")
 
-	defer connect.Close()
+	//defer connect.Close()
 
 	err = connect.Ping()
 	if err != nil {
@@ -68,4 +71,14 @@ func Database() {
 	}
 	log.Printf("Ping completed")
 
+	err = db.AutoMigrate(&Book{})
+	if err != nil {
+		panic("Failed to connect to database: " + err.Error())
+	}
+
+	err = db.AutoMigrate(&auth.Users{})
+	if err != nil {
+		panic("Failed to connect:" + err.Error())
+	}
+	DB = db
 }
